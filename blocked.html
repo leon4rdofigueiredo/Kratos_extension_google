@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!--
+    blocked.html — Página exibida no lugar de um site de IA bloqueado.
+    O background redireciona para cá (regra declarativeNetRequest) e blocked.js preenche o nome do serviço.
+    Precisa estar em "web_accessible_resources" no manifest.json para que o redirecionamento funcione.
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso bloqueado</title>
+    <style>
+        /* Página inteira em cinza claro, com o cartão centralizado na tela */
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4fafd;
+               font: 16px/1.5 system-ui, sans-serif; color: #0f2233; }
+        /* Cartão branco com a mensagem */
+        main { max-width: 520px; margin: 16px; padding: 32px; background: #fff; border-radius: 12px;
+               box-shadow: 0 4px 24px rgba(15, 60, 90, 0.1); }
+        h1 { margin-top: 0; font-size: 22px; color: #c23434; }
+        code { background: #eaf6fc; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Acesso bloqueado</h1>
+        <!-- "service" e "domain" são preenchidos por blocked.js a partir da URL (?d=...&n=...) -->
+        <p>O uso de <strong id="service">este serviço de IA</strong> (<code id="domain"></code>) não é permitido pela política de segurança da empresa.</p>
+        <p>Este acesso foi registrado. Em caso de dúvida, procure a equipe de Segurança da Informação.</p>
+    </main>
+    <script src="blocked.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+// =====================================================================================
+// manifest.json — Identidade e permissões da extensão
+// -------------------------------------------------------------------------------------
+// É o primeiro arquivo que o Chrome lê: diz o nome da extensão, quais arquivos ela usa
+// e o que ela pode fazer no navegador. (O Chrome aceita comentários // neste arquivo.)
+// =====================================================================================
+{
+    // Formato atual de extensões do Chrome (Manifest V3).
+    "manifest_version": 3,
+
+    // Versão da extensão. Vai junto em cada evento de auditoria (campo extVersion).
+    "version": "0.1.0",
+
+    // Nome, descrição e autor exibidos em chrome://extensions.
+    "name": "IA Extension",
+    "description": "Detecta e controla o uso de IA generativa conforme a política da empresa.",
+    "author": "Leonardo Figueiredo",
+
+    // Capacidades que a extensão pede ao Chrome:
+    "permissions": [
+        "storage",               // guardar política, configuração e fila de eventos (chrome.storage)
+        "unlimitedStorage",      // a fila pode ter screenshots e passar do limite padrão de 10 MB
+        "alarms",                // tarefas periódicas: atualizar a política e reenviar eventos
+        "tabs",                  // saber qual é a aba ativa e capturar a tela visível
+        "webNavigation",         // perceber quando o usuário navega para um site de IA
+        "scripting",             // injetar o detector (content/*.js) nos sites de IA
+        "declarativeNetRequest", // bloquear/redirecionar sites antes de eles carregarem
+        "identity",              // ler a conta Google logada no Chrome...
+        "identity.email"         // ...incluindo o e-mail (identifica o usuário nos eventos e autorizações)
+    ],
+
+    // Em quais sites a extensão pode agir. "<all_urls>" = todos, porque a lista de sites de IA
+    // vem do backend e pode mudar a qualquer momento sem reinstalar a extensão.
+    "host_permissions": ["<all_urls>"],
+
+    // Código que roda em segundo plano, fora das páginas (o "cérebro" da extensão).
+    "background": {
+        "service_worker": "src/background.js",
+        "type": "module" // permite usar import/export entre os arquivos de src/
+    },
+
+    // Ícone na barra do Chrome: texto ao passar o mouse e página que abre ao clicar.
+    "action": {
+        "default_title": "IA Extension",
+        "default_popup": "popup.html"
+    },
+
+    // Configuração corporativa (GPO / Google Admin Console): os campos aceitos estão em managed_schema.json.
+    "storage": {
+        "managed_schema": "managed_schema.json"
+    },
+
+    // Arquivos da extensão que podem ser abertos a partir de outros sites.
+    // Necessário para redirecionar um site bloqueado para a página blocked.html.
+    "web_accessible_resources": [
+        {
+            "resources": ["blocked.html"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}

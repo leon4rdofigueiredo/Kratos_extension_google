@@ -1,0 +1,55 @@
+// =====================================================================================
+// policies/juridico.json — Política do grupo "juridico" (mais restritiva)
+// -------------------------------------------------------------------------------------
+// Exemplo de política por departamento: todos os sites de IA bloqueados, exceto o
+// Copilot corporativo. Cada campo está explicado em detalhe em default.json.
+// =====================================================================================
+{
+    "version": "2026-09-24.1-juridico",
+    "refreshMinutes": 15,
+
+    // Todos os sites de IA bloqueados por padrão...
+    "defaultAction": "block",
+    "redirectUrl": "",
+    // ...exceto o Copilot (ferramenta homologada pela empresa), que fica só monitorado.
+    "overrides": {
+        "copilot.microsoft.com": "monitor"
+    },
+
+    // Dados sensíveis: tudo bloqueado, sem ninguém autorizado.
+    "pii": {
+        "enabled": true,
+        "mode": "block",
+        "actions": {},
+        "allowRequests": true,
+        "exceptions": [],
+        "types": ["cpf", "cnpj", "rg", "cnh", "pis", "voter_id", "email", "phone", "card", "secret"],
+        // Termos típicos de documentos jurídicos sigilosos.
+        "keywords": ["confidencial", "segredo de justiça", "sigiloso"],
+        "patterns": [
+            // Número de processo judicial no padrão CNJ: NNNNNNN-DD.AAAA.J.TR.OOOO
+            { "name": "processo", "label": "[PROCESSO]", "regex": "\\b\\d{7}-?\\d{2}\\.?\\d{4}\\.?\\d\\.?\\d{2}\\.?\\d{4}\\b" }
+        ]
+    },
+
+    // Evidência: captura a tela em todo acesso ao Copilot e em toda detecção de dado sensível.
+    "screenshot": {
+        "onAccess": true,
+        "onPii": true
+    },
+
+    "domains": [
+        { "domain": "chatgpt.com", "name": "ChatGPT" },
+        { "domain": "chat.openai.com", "name": "ChatGPT" },
+        { "domain": "gemini.google.com", "name": "Gemini" },
+        { "domain": "copilot.microsoft.com", "name": "Copilot" },
+        { "domain": "claude.ai", "name": "Claude" },
+        { "domain": "perplexity.ai", "name": "Perplexity" },
+        { "domain": "deepseek.com", "name": "DeepSeek" },
+        { "domain": "chat.mistral.ai", "name": "Mistral" },
+        { "domain": "grok.com", "name": "Grok" },
+        { "domain": "meta.ai", "name": "Meta AI" },
+        { "domain": "poe.com", "name": "Poe" },
+        { "domain": "character.ai", "name": "Character.AI" }
+    ]
+}

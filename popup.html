@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+    index.html — Popup da extensão (abre ao clicar no ícone; definido em manifest.json → action.default_popup).
+    Só estrutura e estilo; o comportamento está em popup.js (extensões MV3 não permitem script inline).
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>IA Extension</title>
+    <style>
+        /* Janela do popup: largura fixa (o Chrome ajusta a altura ao conteúdo) */
+        body { width: 340px; margin: 0; font: 13px/1.4 system-ui, sans-serif; color: #0f2233; background: #fff; }
+
+        /* Faixa azul do topo com o nome da extensão */
+        header { padding: 12px 16px; background: #1aa3dd; color: #fff; }
+        header h1 { margin: 0; font-size: 15px; }
+
+        /* Cada bloco (Esta aba / Política / Configuração), separado por uma linha */
+        section { padding: 10px 16px; border-bottom: 1px solid #dbe8ef; }
+        /* Título pequeno em maiúsculas de cada bloco */
+        h2 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #7c8a96; }
+
+        /* Lista "nome → valor" da política em duas colunas (dt = nome, dd = valor) */
+        dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0; }
+        dt { color: #4b5b69; }
+        dd { margin: 0; text-align: right; word-break: break-all; }
+
+        /* Selo colorido da situação da aba (a classe vem da ação: monitor, block, redirect ou none) */
+        .badge { display: inline-block; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+        .monitor { background: #fdf5e6; color: #d98a0b; }           /* amarelo: permitido, mas registrado */
+        .block, .redirect { background: #fdecef; color: #d1344b; }  /* vermelho: bloqueado/redirecionado */
+        .none { background: #eaf7fa; color: #1f9d6b; }              /* verde: não é site de IA */
+
+        /* Mensagem de erro de sincronização */
+        .err { color: #c23434; }
+
+        /* Formulário de configuração */
+        label { display: block; margin-top: 6px; color: #4b5b69; }
+        input { width: 100%; box-sizing: border-box; padding: 5px 7px; border: 1px solid #dbe8ef; border-radius: 5px; font: inherit; }
+        button { margin-top: 8px; padding: 6px 12px; border: 0; border-radius: 5px; background: #1aa3dd; color: #fff; font: inherit; cursor: pointer; }
+        button:disabled { opacity: .5; cursor: default; } /* enquanto sincroniza */
+        #msg { margin-left: 8px; color: #4b5b69; }        /* "Salvo." ou erro ao salvar */
+    </style>
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header><h1>IA Extension</h1></header>
+
+    <!-- Situação do site aberto na aba atual: monitorado, bloqueado, redirecionado ou fora da lista -->
+    <section>
+        <h2>Esta aba</h2>
+        <div id="tab">…</div> <!-- preenchido por popup.js → render() -->
+
+    </section>
+
+    <!-- Resumo da política em uso e da comunicação com o backend -->
+    <section>
+        <h2>Política</h2>
+        <!-- Os "…" são trocados pelos valores reais em popup.js, pelo id de cada <dd> -->
+        <dl>
+            <dt>Versão</dt><dd id="version">…</dd>
+            <dt>Origem</dt><dd id="source">…</dd>
+            <dt>Grupo</dt><dd id="group">…</dd>
+            <dt>Domínios monitorados</dt><dd id="domains">…</dd>
+            <dt>Proteção de PII</dt><dd id="pii">…</dd>
+            <dt>Última sincronização</dt><dd id="sync">…</dd>
+            <dt>Eventos na fila</dt><dd id="queued">…</dd>
+        </dl>
+        <div id="syncError" class="err"></div>          <!-- aparece só se o backend falhar -->
+        <button id="syncBtn">Sincronizar agora</button> <!-- baixa a política e envia eventos na hora -->
+
+    </section>
+
+    <!-- Configuração local (desenvolvimento). Escondida quando a empresa define a configuração via GPO/Admin Console -->
+    <section id="configSection">
+        <h2>Configuração</h2>
+        <form id="configForm">
+            <!-- endereço do servidor que fornece as políticas e recebe os eventos -->
+            <label>URL do backend <input name="apiUrl" placeholder="http://localhost:8787"></label>
+            <!-- senha de acesso ao backend; nunca é exibida, vazio = manter a atual -->
+            <label>Chave de API <input name="apiKey" type="password" placeholder="(inalterada)"></label>
+            <!-- departamento: define qual política o backend devolve (ex.: default, juridico) -->
+            <label>Grupo <input name="group" placeholder="default"></label>
+            <button type="submit">Salvar</button><span id="msg"></span>
+        </form>
+        <p id="managedNote" hidden>Configuração definida pela empresa.</p>
+    </section>
+
+    <!-- Comportamento do popup (no fim do body, para os elementos acima já existirem) -->
+    <script src="popup.js"></script>
+</body>
+</html>

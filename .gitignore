@@ -1,0 +1,8 @@
+# dados gravados pelo servidor de testes (contêm CPF, textos e prints)
+server/data/
+
+# configurações locais de editor/ferramentas
+.claude/
+.vscode/
+
+node_modules/

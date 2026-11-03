@@ -1,0 +1,111 @@
+// =====================================================================================
+// policies/default.json — Política do grupo "default" (e de grupos sem arquivo próprio)
+// -------------------------------------------------------------------------------------
+// Diz O QUE É PERMITIDO. A extensão baixa este arquivo a cada "refreshMinutes" pelo
+// endpoint GET /v1/policy?group=default. Para criar a política de outro departamento,
+// copie este arquivo com o nome do grupo (ex.: financeiro.json).
+// Os comentários são removidos pelo server.js antes de enviar para a extensão.
+// =====================================================================================
+{
+    // Identificador da versão. Quando muda, a extensão registra o evento "policy_applied".
+    // Troque sempre que alterar a política, para ficar rastreável na auditoria.
+    "version": "2026-09-24.1",
+
+    // De quanto em quanto tempo (minutos) a extensão busca a política de novo.
+    "refreshMinutes": 15,
+
+    // ---------------- Acesso aos sites de IA ----------------
+
+    // O que acontece ao abrir um site da lista "domains":
+    //   "monitor"  → permite e registra o acesso
+    //   "block"    → mostra a página "Acesso bloqueado"
+    //   "redirect" → leva para "redirectUrl"
+    "defaultAction": "monitor",
+
+    // Página institucional usada pela ação "redirect" (ex.: política de uso de IA na intranet).
+    "redirectUrl": "",
+
+    // Ação específica por domínio, com prioridade sobre "defaultAction".
+    "overrides": {
+        "deepseek.com": "block"
+    },
+
+    // ---------------- Dados sensíveis (pii) ----------------
+    "pii": {
+        // Liga/desliga toda a proteção de dados sensíveis.
+        "enabled": true,
+
+        // Ação padrão ao detectar um dado:
+        //   "block" → impede a colagem/envio (com opção de pedir autorização)
+        //   "mask"  → troca o dado por um marcador ([CPF], [EMAIL]...) e pede para reenviar
+        "mode": "block",
+
+        // Ação por tipo, com prioridade sobre "mode". Ex.: { "email": "mask" }
+        // mascara e-mails e continua bloqueando todo o resto.
+        "actions": {},
+
+        // Mostra o botão "Solicitar autorização" no aviso de bloqueio (false = esconde).
+        "allowRequests": true,
+
+        // Autorizações: libera tipos de dado para usuários/grupos até uma data.
+        //   users:  e-mails (conta Google do Chrome) autorizados
+        //   groups: ou grupos inteiros, ex.: ["rh"]
+        //   types:  o que fica liberado: tipos embutidos, "name" de um pattern,
+        //           ou "keyword" para as keywords
+        //   until:  último dia de validade (inclusive); depois disso o bloqueio volta sozinho
+        //   reason: justificativa/chamado (só documentação)
+        // Fluxo: usuário pede autorização → chega o evento "pii_authorization_request" →
+        // a Segurança aprova acrescentando uma linha aqui → vale na próxima sincronização.
+        "exceptions": [
+            { "users": ["rh.folha@empresa.com.br"], "types": ["cpf", "pis"], "until": "2026-12-31", "reason": "Chamado #1234 - conferência de folha" }
+        ],
+
+        // Tipos embutidos detectados. Tire um tipo da lista para parar de detectá-lo.
+        //   cpf, cnpj, rg, cnh, pis, voter_id (título de eleitor), email, phone (telefone),
+        //   card (cartão), secret (senhas, tokens de API, chaves privadas)
+        "types": ["cpf", "cnpj", "rg", "cnh", "pis", "voter_id", "email", "phone", "card", "secret"],
+
+        // Palavras/expressões proibidas da empresa. Aceita texto simples ou objeto com
+        // marcador próprio. Ignora maiúsculas, acentos e letras espaçadas ("c o n f i d e n c i a l"),
+        // mas só pega a palavra inteira ("confidencialidade" não conta).
+        "keywords": [
+            "confidencial",
+            "uso interno",
+            { "term": "Projeto Fênix", "label": "[PROJETO_SIGILOSO]" }
+        ],
+
+        // Padrões próprios da empresa em expressão regular (regex):
+        //   name:  nome do tipo (aparece nos eventos e pode ser usado em "exceptions")
+        //   label: marcador que substitui o trecho no modo "mask"
+        //   regex: o padrão (no JSON, "\" precisa ser escrito "\\")
+        //   flags: "i" = ignora maiúsculas/minúsculas
+        "patterns": [
+            { "name": "matricula", "label": "[MATRICULA]", "regex": "\\bMAT-?\\d{6}\\b", "flags": "i" },   // ex.: MAT-123456
+            { "name": "contrato", "label": "[CONTRATO]", "regex": "\\bCT-\\d{4}/\\d{2,4}\\b", "flags": "i" } // ex.: CT-2024/25
+        ]
+    },
+
+    // ---------------- Evidência (screenshots) ----------------
+    "screenshot": {
+        "onAccess": false, // captura a tela ao abrir um site de IA permitido
+        "onPii": true      // captura a tela quando um dado sensível é detectado
+    },
+
+    // ---------------- Sites de IA ----------------
+    // domain: endereço (também cobre subdomínios: "deepseek.com" pega "chat.deepseek.com")
+    // name:   nome exibido nos avisos, no popup e nos eventos
+    "domains": [
+        { "domain": "chatgpt.com", "name": "ChatGPT" },
+        { "domain": "chat.openai.com", "name": "ChatGPT" },
+        { "domain": "gemini.google.com", "name": "Gemini" },
+        { "domain": "copilot.microsoft.com", "name": "Copilot" },
+        { "domain": "claude.ai", "name": "Claude" },
+        { "domain": "perplexity.ai", "name": "Perplexity" },
+        { "domain": "deepseek.com", "name": "DeepSeek" },
+        { "domain": "chat.mistral.ai", "name": "Mistral" },
+        { "domain": "grok.com", "name": "Grok" },
+        { "domain": "meta.ai", "name": "Meta AI" },
+        { "domain": "poe.com", "name": "Poe" },
+        { "domain": "character.ai", "name": "Character.AI" }
+    ]
+}

@@ -1,0 +1,49 @@
+// =====================================================================================
+// default-policy.json — Política usada quando NÃO há backend configurado
+// -------------------------------------------------------------------------------------
+// Mesmo formato das políticas do servidor (server/policies/*.json), onde cada campo está
+// explicado em detalhe. Aqui fica a política mais segura possível para uso sem backend:
+// sites de IA só monitorados, mas todo dado sensível bloqueado.
+// Lida em src/policy.js → loadDefaultPolicy() (os comentários são removidos antes).
+// =====================================================================================
+{
+    "version": "local-default",
+    "refreshMinutes": 15,       // de quanto em quanto tempo tenta buscar a política no backend
+    "defaultAction": "monitor", // sites de IA: permitidos, mas cada acesso é registrado
+    "redirectUrl": "",
+    "overrides": {},            // nenhuma exceção por domínio
+
+    // Dados sensíveis: todos os tipos detectados e bloqueados.
+    "pii": {
+        "enabled": true,
+        "mode": "block",
+        "actions": {},
+        "allowRequests": true,  // mostra o botão "Solicitar autorização"
+        "types": ["cpf", "cnpj", "rg", "cnh", "pis", "voter_id", "email", "phone", "card", "secret"],
+        "keywords": [],         // sem backend não há palavras-chave da empresa
+        "patterns": [],
+        "exceptions": []        // sem backend ninguém é autorizado
+    },
+
+    // Evidência: captura de tela só quando um dado sensível é detectado.
+    "screenshot": {
+        "onAccess": false,
+        "onPii": true
+    },
+
+    // Sites de IA conhecidos (cada domínio também cobre seus subdomínios).
+    "domains": [
+        { "domain": "chatgpt.com", "name": "ChatGPT" },
+        { "domain": "chat.openai.com", "name": "ChatGPT" },
+        { "domain": "gemini.google.com", "name": "Gemini" },
+        { "domain": "copilot.microsoft.com", "name": "Copilot" },
+        { "domain": "claude.ai", "name": "Claude" },
+        { "domain": "perplexity.ai", "name": "Perplexity" },
+        { "domain": "deepseek.com", "name": "DeepSeek" },
+        { "domain": "chat.mistral.ai", "name": "Mistral" },
+        { "domain": "grok.com", "name": "Grok" },
+        { "domain": "meta.ai", "name": "Meta AI" },
+        { "domain": "poe.com", "name": "Poe" },
+        { "domain": "character.ai", "name": "Character.AI" }
+    ]
+}

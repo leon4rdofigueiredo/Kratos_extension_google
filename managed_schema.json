@@ -1,0 +1,30 @@
+// =====================================================================================
+// managed_schema.json — Campos que a EMPRESA pode configurar remotamente
+// -------------------------------------------------------------------------------------
+// A equipe de TI define estes valores pela GPO (Windows) ou pelo Google Admin Console.
+// O usuário não consegue alterá-los, e quando eles existem o formulário de configuração
+// do popup some. Lidos em src/policy.js → getConfig().
+// =====================================================================================
+{
+    "type": "object",
+    "properties": {
+        // Endereço do backend que fornece as políticas e recebe os eventos.
+        "apiUrl": {
+            "title": "URL do backend",
+            "description": "Ex.: https://ia-guard.empresa.com.br",
+            "type": "string"
+        },
+        // Chave de acesso ao backend (enviada no cabeçalho Authorization: Bearer ...).
+        "apiKey": {
+            "title": "Chave de API",
+            "type": "string"
+        },
+        // Departamento do usuário. O backend devolve a política deste grupo
+        // (ex.: "juridico" → server/policies/juridico.json).
+        "group": {
+            "title": "Grupo/departamento",
+            "description": "Define qual política o backend devolve.",
+            "type": "string"
+        }
+    }
+}
